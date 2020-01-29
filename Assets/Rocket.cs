@@ -35,6 +35,8 @@ public class Rocket : MonoBehaviour
         print("Thrust");
         rigidbody.AddRelativeForce(Vector3.up);
       }
+
+      rigidbody.freezeRotation = true;
       if (Input.GetKey(KeyCode.A)) {
         if (!Input.GetKey(KeyCode.D)) {
           transform.Rotate(rotationspeed * Vector3.forward * Time.deltaTime);
@@ -45,6 +47,8 @@ public class Rocket : MonoBehaviour
           transform.Rotate(-(rotationspeed * Vector3.forward * Time.deltaTime));
         }
       }
+
+      rigidbody.freezeRotation = false;
     }
 
     public static IEnumerator FadeOut (AudioSource ad, float fadetime) {
