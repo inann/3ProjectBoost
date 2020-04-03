@@ -5,7 +5,8 @@ using UnityEngine;
 public class Rocket : MonoBehaviour
 {
     Rigidbody rigidbody;
-    float rotationspeed = 45.0f;
+    [SerializeField] float rcsThrust = 100f;
+    [SerializeField] float mainThrust = 1f;
     float fadeDuration = 0.75f;
     AudioSource audiosource;
     // Start is called before the first frame update
@@ -22,6 +23,11 @@ public class Rocket : MonoBehaviour
     }
 
     private void ProcessInput() {
+      Thrust();
+      Rotate();
+    }
+
+    private void Thrust() {
       if (Input.GetKeyDown(KeyCode.Space)) {
         audiosource.Play();
       }
@@ -33,22 +39,42 @@ public class Rocket : MonoBehaviour
 
       if (Input.GetKey(KeyCode.Space)) {
         print("Thrust");
-        rigidbody.AddRelativeForce(Vector3.up);
+        rigidbody.AddRelativeForce(Vector3.up * mainThrust);
       }
+    }
 
+    private void Rotate() {
       rigidbody.freezeRotation = true;
+      float rotationThisFrame = rcsThrust * Time.deltaTime;
+
       if (Input.GetKey(KeyCode.A)) {
         if (!Input.GetKey(KeyCode.D)) {
-          transform.Rotate(rotationspeed * Vector3.forward * Time.deltaTime);
+          transform.Rotate(Vector3.forward * rotationThisFrame);
         }
       }
       else if (Input.GetKey(KeyCode.D)){
         if (!Input.GetKey(KeyCode.A)) {
-          transform.Rotate(-(rotationspeed * Vector3.forward * Time.deltaTime));
+          transform.Rotate(-(Vector3.forward * rotationThisFrame));
         }
       }
 
       rigidbody.freezeRotation = false;
+    }
+
+    void OnCollisionEnter(Collision collision) {
+      // Check the collision object for tags
+      switch (collision.gameObject.tag) {
+        case "Friendly":
+          {
+            print("Friendly");
+            break;
+          }
+        default:
+          {
+            print("Death");
+            break;
+          }
+      }
     }
 
     public static IEnumerator FadeOut (AudioSource ad, float fadetime) {
